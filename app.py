@@ -100,19 +100,27 @@ def webhook():
     if from_number == DR_SHAGUN_NUMBER and incoming_msg.lower().startswith("reply to"):
         print("--- DOCTOR REPLY DETECTED ---")
         try:
-            # ** THE FIX IS HERE: split(":", 1) splits only on the first colon **
-            parts = incoming_msg.split(":", 1)
-            target_customer_number_raw = parts[0].replace("Reply to", "")
-            target_customer_number = target_customer_number_raw.strip()
-            reply_content = parts[1].strip()
+            # ** THE DEFINITIVE FIX IS HERE **
+            # Remove the "Reply to " prefix to isolate the main content
+            content = incoming_msg[len("Reply to "):]
             
-            print(f"Target Customer Number: '{target_customer_number}'")
-            print(f"Reply Content: '{reply_content}'")
+            # Split the content into exactly 3 parts using the colon as a delimiter
+            parts = content.split(':', 2)
             
-            final_message = f"An update from Dr. Shagun:\n\n{reply_content}"
-            
-            client.messages.create(from_=TWILIO_NUMBER, to=target_customer_number, body=final_message)
-            print("--- Doctor's reply sent successfully. ---")
+            if len(parts) == 3:
+                # Reconstruct the full 'whatsapp:+1...' number
+                target_customer_number = f"{parts[0]}:{parts[1]}".strip()
+                reply_content = parts[2].strip()
+                
+                print(f"Target Customer Number: '{target_customer_number}'")
+                print(f"Reply Content: '{reply_content}'")
+                
+                final_message = f"An update from Dr. Shagun:\n\n{reply_content}"
+                
+                client.messages.create(from_=TWILIO_NUMBER, to=target_customer_number, body=final_message)
+                print("--- Doctor's reply sent successfully. ---")
+            else:
+                print("!!! ERROR: Could not parse doctor's reply correctly. Not enough parts. !!!")
 
         except Exception as e:
             print(f"!!! ERROR PROCESSING DOCTOR'S REPLY: {e} !!!")
