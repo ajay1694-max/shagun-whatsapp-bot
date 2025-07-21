@@ -9,7 +9,7 @@ from twilio.rest import Client
 TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID")
 TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-DR_SHAGUN_NUMBER = "whatsapp:+917088744604" # Dr. Shagun's number in WhatsApp format
+DR_SHAGUN_NUMBER = "whatsapp:+919031807701" # Dr. Shagun's new number
 TWILIO_NUMBER = os.getenv("TWILIO_NUMBER") # Your Twilio Sandbox number
 
 # Configure Gemini AI and Twilio Client
