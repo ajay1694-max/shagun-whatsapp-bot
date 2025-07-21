@@ -31,10 +31,12 @@ app = Flask(__name__)
 def triage_query(query):
     """Categorizes the user's query with more autonomy."""
     prompt = f"""
-    You are a highly intelligent triage assistant for a dental clinic's WhatsApp bot. Your job is to categorize the user's query. Your judgment must be precise.
+    You are a highly intelligent triage assistant for a dental clinic's WhatsApp bot. Your judgment must be precise.
 
-    1.  **CLINIC_INFO**: Questions about specific info found ONLY in the clinic's knowledge base below (hours, location, listed services).
+    1.  **CLINIC_INFO**: Questions about specific info found ONLY in the clinic's knowledge base. This includes questions about hours, address, landmark, contact details, and the list of services offered.
         - Knowledge Base: "{KNOWLEDGE_BASE}"
+        - Example: "what are your hours?" -> CLINIC_INFO
+        - Example: "where is the clinic?" -> CLINIC_INFO
     2.  **GENERAL_HEALTH**: Requests for general information about any dental concept, procedure, or hygiene (e.g., "what is an RCT?", "benefits of flossing?"). You should use your own vast knowledge for this.
     3.  **ESCALATE**: Questions implying a personal situation: mentions of specific pain, symptoms, issues with past treatments, asking for prices/costs, or emergencies.
 
@@ -52,7 +54,6 @@ def triage_query(query):
 
 def get_clinic_info_answer(query):
     """Answers based on the knowledge base."""
-    # This function remains the same
     prompt = f"Using ONLY this info: '{KNOWLEDGE_BASE}', answer the query: '{query}'"
     try:
         response = model.generate_content(prompt)
@@ -96,7 +97,6 @@ def webhook():
                 target_customer_number = f"{parts[0]}:{parts[1]}".strip()
                 reply_instruction = parts[2].strip()
                 
-                # AI-powered rephrasing
                 final_message = rephrase_doctor_reply(reply_instruction)
                 
                 print(f"Target: '{target_customer_number}', Original Instruction: '{reply_instruction}', Rephrased: '{final_message}'")
@@ -113,7 +113,6 @@ def webhook():
         print("--- CUSTOMER QUERY DETECTED ---")
         response_text = ""
         
-        # Quick check for simple greetings
         if incoming_msg.lower() in ['hi', 'hello', 'hey', 'thanks', 'thank you', 'ok']:
             response_text = "Hello! How can I help you today regarding Shagun Dental Studio?"
         else:
