@@ -27,7 +27,7 @@ except FileNotFoundError:
 # Flask app setup
 app = Flask(__name__)
 
-# --- NEW TRIAGE AND RESPONSE FUNCTIONS ---
+# --- TRIAGE AND RESPONSE FUNCTIONS ---
 
 def triage_query(query):
     """Uses Gemini to categorize the user's query."""
@@ -47,13 +47,6 @@ def triage_query(query):
     3.  **GENERAL_HEALTH**: If the query is a general dental health question that is NOT about a specific person's pain, symptoms, or ongoing treatment (e.g., "what is the best way to whiten teeth?", "how often should I floss?").
     4.  **ESCALATE**: If the query mentions specific pain, symptoms, a problem with an ongoing treatment, asks for a price for a procedure, seems like an emergency, or is about a specific patient's case. Anything that requires a doctor's personal attention.
 
-    Examples:
-    - "hi": GREETING
-    - "what time do you close?": CLINIC_INFO
-    - "is it better to use an electric or manual toothbrush?": GENERAL_HEALTH
-    - "my tooth is hurting a lot since yesterday": ESCALATE
-    - "how much for a dental implant?": ESCALATE
-
     Query: "{query}"
     Category:
     """
@@ -64,7 +57,7 @@ def triage_query(query):
         return category
     except Exception as e:
         print(f"Error during triage: {e}")
-        return "ESCALATE" # Default to escalation if triage fails
+        return "ESCALATE"
 
 def get_clinic_info_answer(query):
     """Generates an answer based on the knowledge base."""
@@ -107,6 +100,7 @@ def webhook():
     if from_number == DR_SHAGUN_NUMBER and incoming_msg.lower().startswith("reply to"):
         print("--- DOCTOR REPLY DETECTED ---")
         try:
+            # ** THE FIX IS HERE: split(":", 1) splits only on the first colon **
             parts = incoming_msg.split(":", 1)
             target_customer_number_raw = parts[0].replace("Reply to", "")
             target_customer_number = target_customer_number_raw.strip()
@@ -159,4 +153,3 @@ def webhook():
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
-
